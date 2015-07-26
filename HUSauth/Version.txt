@@ -1,0 +1,3 @@
+﻿Copyright (c) 2015 mohemohe
+License: The MIT/X11 License <http://opensource.org/licenses/MIT>
+Source : https://github.com/mohemohe/HUSauth-core

@@ -1,0 +1,11 @@
+﻿Usage: HUSauth [-u USERID -p PASSWORD] [OPTION]...
+
+  -e,  --encrypted	use the encrypted password
+  -c,  --check		check for an internet connection and exit
+			  not require USERID and PASSWORD
+  -v,  --verbose	verbose output
+  -h,  --help		output this help message and exit
+  --version		output version of HUSauth and exit
+
+example of authentication using the encrypted password and verbose output
+HUSauth -u USERID -p PASSWORD -e -v
