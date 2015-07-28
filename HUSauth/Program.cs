@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace HUSauth
 {
@@ -17,6 +14,7 @@ namespace HUSauth
         private static bool IsOutputHelpOnly { get; set; } = false;
         private static bool IsOutputVersionOnly { get; set; } = false;
         private static bool IsEncryptedPass { get; set; } = false;
+		private static bool IsForceAuthentication{ get; set; } = false;
 
         static void Main(string[] args)
         {
@@ -71,6 +69,11 @@ namespace HUSauth
                     case "-encrypted":
                         IsEncryptedPass = true;
                         break;
+
+					case "-f":
+					case "-force":
+						IsForceAuthentication = true;
+						break;
 
                     case "-v":
                     case "-verbose":
@@ -136,7 +139,7 @@ namespace HUSauth
                 Pass = Encrypt.DecryptString(Pass);
             }
 
-            if (!OutputAvailable())
+			if (IsForceAuthentication || !OutputAvailable())
             {
                 Network.Authentication(User, Pass, IsVerboseOutput);
                 OutputAvailable();

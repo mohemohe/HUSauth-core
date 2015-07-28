@@ -1,43 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace HUSauth
 {
     class Network
     {
+		private static string UserAgent { get; } = "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; ASU2JS; rv:11.0) like Gecko | HUSauth";
+
         public static bool IsAvailable(bool isVerboseOutput)
         {
-            bool result = false;
+			string resText = null;
 
-            using (var ping = new Ping())
-            {
-                if (isVerboseOutput) Console.WriteLine(@"ping to randgrid.ghippos.net...");
+			using (var wc = new WebClient())
+			{
+				wc.Headers.Add("user-agent", UserAgent);
 
-                for (int i = 1; i <= 5; i++)
-                {
-                    if (isVerboseOutput) Console.Write(i + ": ");
-                    var reply = ping.Send(@"randgrid.ghippos.net", 500);
+				const string checkServer = @"http://157.7.201.213/check.html";
+				if (isVerboseOutput) Console.WriteLine("trying \"GET\" " + checkServer + " ...");
 
-                    if (reply?.Status == IPStatus.Success)
-                    {
-                        if (isVerboseOutput) Console.WriteLine(@"receive pong");
-                        result = true;
-                        break;
-                    }
-                    else
-                    {
-                        if (isVerboseOutput) Console.WriteLine(@"error");
-                    }
-                }
-            }
+				for(var i = 1; i <= 5; i++) 
+				{
+					try
+					{
+						var resData = wc.OpenRead(checkServer);
+						using(var sr = new StreamReader(resData))
+						{
+							resText = sr.ReadToEnd();
+						}
+						break;
+					}
+					catch (WebException)
+					{
+						if (isVerboseOutput) Console.WriteLine(@"server is not responding");
+					}
+					catch (Exception)
+					{
+						if (isVerboseOutput) Console.WriteLine(@"failed to an unknown error");
+					}                    
+				}
+			}
 
-            return result;
+			return resText.Contains(@"<title>CHECK</title>");
         }
 
         public static bool Authentication(string id, string password, bool isVerboseOutput)
@@ -46,7 +54,7 @@ namespace HUSauth
             {
                 {"user_id", id},
                 {"pass", password},
-                {"url", "http://randgrid.ghippos.net/check.html"},
+                {"url", "http://www.wh2.fiberbit.net/canned/chp/index2.html"},
                 {"lang", "ja"},
                 {"event", "1"},
             };
@@ -55,10 +63,9 @@ namespace HUSauth
 
             using (var wc = new WebClient())
             {
-                wc.Headers.Add("user-agent",
-                    "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; ASU2JS; rv:11.0) like Gecko | HUSauth");
+				wc.Headers.Add("user-agent", UserAgent);
 
-                string authServer = @"http://gonet.localhost/cgi-bin/guide.cgi";
+				const string authServer = @"http://192.168.253.81/cgi-bin/guide.cgi";
                 if (isVerboseOutput) Console.WriteLine(@"authenticate to " + authServer);
 
                 for(var i = 1; i <= 5; i++) 
@@ -72,7 +79,7 @@ namespace HUSauth
                     }
                     catch (WebException)
                     {
-                        if (isVerboseOutput) Console.WriteLine(@"authentication server is not responding");
+                        if (isVerboseOutput) Console.WriteLine(@"server is not responding");
                     }
                     catch (Exception)
                     {

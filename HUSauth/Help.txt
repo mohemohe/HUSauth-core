@@ -1,6 +1,7 @@
 ﻿Usage: HUSauth [-u USERID -p PASSWORD] [OPTION]...
 
   -e,  --encrypted	use the encrypted password
+  -f,  --force		force authenticate
   -c,  --check		check for an internet connection and exit
 			  not require USERID and PASSWORD
   -v,  --verbose	verbose output
